@@ -3,17 +3,16 @@
 
 # IBM Developer Model Asset Exchange: Nucleus Segmenter
 
-The Nucleus Segmenter model detects the nuclei in the microscopy image. The 
-model is developed based on the architecture of Mask R-CNN using Feature Pyramid 
-network (FPN) and a ResNet50 backbone. Given an image (64 * 64, 128 * 128, or 
-256 * 256), this model outputs the masks and possibilities for each detected 
-nucleus. The mask is compressed using [Run-length encoding (RLE)](https://en.wikipedia.org/wiki/Run-length_encoding).       
+The Nucleus Segmenter model detects nuclei in a microscopy image and additionally specifies the pixels in the image that 
+are assigned to each nucleus. The model is developed based on the architecture of Mask R-CNN using Feature Pyramid 
+network (FPN) and a ResNet50 backbone. Given an image (of size 64 x 64, 128 x 128 or 256 x 256), this model outputs the 
+segmentation masks and probabilities for each detected nucleus The mask is compressed using 
+[Run-length encoding (RLE)](https://en.wikipedia.org/wiki/Run-length_encoding).       
 
 The model is based on the TF implementation of [Mask R-CNN](https://github.com/matterport/Mask_RCNN). 
-We use image set [BBBC038v1](https://data.broadinstitute.org/bbbc/BBBC038/) for training, 
-available from the Broad Bioimage Benchmark Collection [Ljosa et al., Nature Methods, 2012].
-The code in this repository deploys the model as a web service in a Docker container. This repository was developed
-as part of the [IBM Developer Model Asset Exchange](https://developer.ibm.com/exchanges/models/).
+The model is trained on the [Broad Bioimage Benchmark Collection (Accession number BBBC038, Version 1)](https://data.broadinstitute.org/bbbc/BBBC038/) 
+dataset of annotated biological images. The code in this repository deploys the model as a web service in a Docker container. 
+This repository was developed as part of the [IBM Developer Model Asset Exchange](https://developer.ibm.com/exchanges/models/).
 
 ## Model Metadata
 | Domain | Application | Industry  | Framework | Training Data | Input Data Format |
@@ -23,6 +22,7 @@ as part of the [IBM Developer Model Asset Exchange](https://developer.ibm.com/ex
 ## References
 * _He, K., Gkioxari, G., Dollár, P. and Girshick, R._, 2017, October. [Mask R-CNN](https://arxiv.org/abs/1703.06870). In Computer Vision (ICCV), 2017 IEEE International Conference on (pp. 2980-2988). IEEE.
 * _Ljosa, V., Sokolnicki, K.L. and Carpenter, A.E._, 2012. Annotated high-throughput microscopy image sets for validation. Nature methods, 9(7), pp.637-637.
+* Broad Bioimage Benchmark Collection [[Ljosa et al., Nature Methods, 2012]](https://www.nature.com/articles/nmeth.2083).
 * [Mask R-CNN Github Repository](https://github.com/matterport/Mask_RCNN)
 
 ## Licenses
@@ -111,8 +111,10 @@ $ docker run -it -p 5000:5000 max-nucleus-segmenter
 
 ### 3. Use the Model
 
-The API server automatically generates an interactive Swagger documentation page. Go to `http://localhost:5000` to load it. From there you can explore the API and also create test requests.
-Use the `model/predict` endpoint to load a test image (you can use one of the test images from the `assets` folder) and get predicted labels for the image from the API.
+The API server automatically generates an interactive Swagger documentation page. Go to `http://localhost:5000` to load 
+it. From there you can explore the API and also create test requests. Use the `model/predict` endpoint to load a test 
+image (you can use one of the test images from the `assets` folder) and get predicted probabilities and segmentation 
+masks for the image from the API.
 
 ![Swagger UI Screenshot](docs/swagger-screenshot.png)
 
@@ -130,41 +132,47 @@ You should see a JSON response like that below:
   "predictions": [
     {
       "mask": [
-        400,
-        2,
-        463,
-        3,
-        527,
-        3,
-        590,
+        3507,
+        1,
+        3571,
+        5,
+        3635,
+        6,
+        3700,
+        5,
+        3766,
         4,
-        655,
+        3831,
         2
       ],
-      "score": 0.9921787977218628
+      "probability": 0.9837305545806885
     },
     
     ...
     
     {
       "mask": [
-        1812,
-        2,
-        1876,
-        5,
-        1941,
+        1079,
+        1,
+        1144,
+        1,
+        1207,
+        3,
+        1271,
         4,
-        2006,
-        4,
-        2070,
-        4,
-        2135,
-        3
+        1336,
+        3,
+        1401,
+        3,
+        1465,
+        3,
+        1530,
+        3,
+        1595,
+        2
       ],
-      "score": 0.9620948433876038
-    }
-  ]
-}
+      "probability": 0.9726951122283936
+    },
 ```
 
 ### 4. Run the Notebook
