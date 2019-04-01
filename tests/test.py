@@ -35,8 +35,8 @@ def test_predict():
 
     # Test by the image with multiple nuclei
     img_png = 'assets/example.png'
-    img_jpg = 'assets/example.jpg'
-    img_tiff = 'assets/example.tiff'
+    img_jpg = 'tests/example.jpg'
+    img_tiff = 'tests/example.tiff'
 
     for img_file in [img_png, img_jpg, img_tiff]:
         with open(img_file, 'rb') as file:

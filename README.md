@@ -3,10 +3,10 @@
 
 # IBM Developer Model Asset Exchange: Nucleus Segmenter
 
-The Nucleus Segmenter model detects nuclei in a microscopy image and additionally specifies the pixels in the image that 
+The Nucleus Segmenter model detects nuclei in a microscopy image and specifies the pixels in the image that 
 are assigned to each nucleus. The model is developed based on the architecture of Mask R-CNN using Feature Pyramid 
 network (FPN) and a ResNet50 backbone. Given an image (of size 64 x 64, 128 x 128 or 256 x 256), this model outputs the 
-segmentation masks and probabilities for each detected nucleus The mask is compressed using 
+segmentation masks and probabilities for each detected nucleus. The mask is compressed using 
 [Run-length encoding (RLE)](https://en.wikipedia.org/wiki/Run-length_encoding).       
 
 The model is based on the TF implementation of [Mask R-CNN](https://github.com/matterport/Mask_RCNN). 
