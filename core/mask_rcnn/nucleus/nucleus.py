@@ -171,5 +171,5 @@ def mask_to_rle(mask, scores):
         if m.sum() == 0.0:
             continue
         rle = rle_encode(m)
-        masks.append({"mask": rle, "score": scores[o-1]})
+        masks.append({"mask": rle, "probability": scores[o-1]})
     return masks

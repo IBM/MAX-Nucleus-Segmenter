@@ -23,9 +23,9 @@ def test_metadata():
     assert r.status_code == 200
 
     metadata = r.json()
-    assert metadata['id'] == "mask_rcnn_nucleus_detection-keras-model"
-    assert metadata['name'] == "mask_rcnn_nucleus_detection Keras Model"
-    assert metadata['description'] == "mask_rcnn_nucleus_detection Keras model trained on 2018 Data Science Bowl"
+    assert metadata['id'] == "max-nucleus-segmenter"
+    assert metadata['name'] == "MAX Nucleus Segmenter"
+    assert metadata['description'] == "Nucleus image segmentation model trained with Keras on 2018 Data Science Bowl dataset"
     assert metadata['license'] == 'Apache License 2.0'
 
 
@@ -33,20 +33,35 @@ def test_predict():
 
     model_endpoint = 'http://localhost:5000/model/predict'
 
-    # Test by the image with multiple nucleis
-    img1_path = 'assets/example.png'
+    # Test by the image with multiple nuclei
+    img_png = 'assets/example.png'
+    img_jpg = 'tests/example.jpg'
+    img_tiff = 'tests/example.tiff'
 
-    with open(img1_path, 'rb') as file:
-        file_form = {'image': (img1_path, file, 'image/jpeg')}
+    for img_file in [img_png, img_jpg, img_tiff]:
+        with open(img_file, 'rb') as file:
+            file_form = {'image': (img_file, file, 'image/jpeg')}
+            r = requests.post(url=model_endpoint, files=file_form)
+
+        assert r.status_code == 200
+        response = r.json()
+
+        assert response['status'] == 'ok'
+        assert 60 <= len(response['predictions']) <= 61
+        assert len(response['predictions'][0]['mask']) > 0
+        assert response['predictions'][0]['probability'] > 0.95
+
+    # Test by the image without nuclei
+    non_nucleus_img = 'assets/non-nucleus.png'
+    with open(non_nucleus_img, 'rb') as file:
+        file_form = {'image': (non_nucleus_img, file, 'image/jpeg')}
         r = requests.post(url=model_endpoint, files=file_form)
 
     assert r.status_code == 200
     response = r.json()
 
     assert response['status'] == 'ok'
-    assert len(response['predictions']) == 61
-    assert len(response['predictions'][0]['mask']) > 0
-    assert response['predictions'][0]['score'] > 0.95
+    assert len(response['predictions']) == 0
 
     # Test by the text data
     img3_path = 'README.md'

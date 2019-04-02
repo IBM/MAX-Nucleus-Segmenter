@@ -7,7 +7,7 @@ import skimage.transform
 from keras.backend import clear_session
 from maxfw.model import MAXModelWrapper
 
-from config import DEFAULT_MODEL_PATH, MODEL_NAME
+from config import DEFAULT_MODEL_PATH
 from core.mask_rcnn.mrcnn import model as model_lib
 from core.mask_rcnn.nucleus.nucleus import NucleusInferenceConfig, mask_to_rle
 
@@ -17,11 +17,11 @@ logger = logging.getLogger()
 class ModelWrapper(MAXModelWrapper):
 
     MODEL_META_DATA = {
-        'id': '{}-keras-model'.format(MODEL_NAME.lower()),
-        'name': '{} Keras Model'.format(MODEL_NAME),
+        'id': 'max-nucleus-segmenter',
+        'name': 'MAX Nucleus Segmenter',
         'description':
-            '{} Keras model trained on 2018 Data Science Bowl'.format(MODEL_NAME),
-        'type': 'Image Segmentation',
+            'Nucleus image segmentation model trained with Keras on 2018 Data Science Bowl dataset',
+        'type': 'Object Detection',
         'license': 'Apache License 2.0',
         'source': 'https://developer.ibm.com/exchanges/models/all/max-nucleus-segmenter/'
     }

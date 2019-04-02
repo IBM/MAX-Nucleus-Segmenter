@@ -7,15 +7,15 @@ from maxfw.core import MAX_API, PredictAPI
 input_parser = MAX_API.parser()
 input_parser.add_argument('image', type=FileStorage, location='files',
                           required=True,
-                          help="An image file (RGB/HWC, 64 * 64, 128 * 128, 256 * 256)")
+                          help="An image file (JPG/PNG/TIFF). Valid input size: 64 * 64, 128 * 128, 256 * 256")
 
 
 label_prediction = MAX_API.model('NucleusPrediction', {
     'mask': fields.List(fields.Integer(
         required=True, description='Segmented masks of each nucleus. The mask '
                                    'is compressed by Run-length encoding.')),
-    'score': fields.Float(
-        required=True, description='Predicted probability for the class label')
+    'probability': fields.Float(
+        required=True, description='Predicted probability for presence of the nucleus')
 })
 
 
