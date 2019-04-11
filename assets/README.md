@@ -12,9 +12,3 @@ All test images are from the [TUPAC 2016 Challenge](http://tupac.tue-image.nl/no
 
 * `example.png` an image that contains multiple nuclei.
 
-## Training dataset
-We used image set [BBBC038v1](https://data.broadinstitute.org/bbbc/BBBC038/), available from the Broad Bioimage Benchmark 
-Collection [[Ljosa et al., Nature Methods, 2012](http://dx.doi.org/10.1038/nmeth.2083)]. According to 
-[this post](https://www.kaggle.com/c/data-science-bowl-2018/discussion/47864), the dataset is under Creative Commons 
-license 0 (CC0 public domain). Credits for the images are provided [here](https://www.kaggle.com/c/data-science-bowl-2018/discussion/54759).
-
