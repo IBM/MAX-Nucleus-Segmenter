@@ -34,6 +34,12 @@ This repository was developed as part of the [IBM Developer Model Asset Exchange
 | Model Code (3rd party) | [MIT](https://opensource.org/licenses/MIT) | [LICENSE](https://github.com/matterport/Mask_RCNN/blob/master/LICENSE) |
 | Test assets | Various | [Asset README](assets/README.md) |
 
+## Training dataset
+We used image set [BBBC038v1](https://data.broadinstitute.org/bbbc/BBBC038/) from 2018 Data Science Bowl®, presented by Booz Allen Hamilton and Kaggle. The dataset is available from the Broad Bioimage Benchmark 
+Collection [[Ljosa et al., Nature Methods, 2012](http://dx.doi.org/10.1038/nmeth.2083)]. According to 
+[this post](https://www.kaggle.com/c/data-science-bowl-2018/discussion/47864), the dataset is under Creative Commons 
+license 0 (CC0 public domain). Credits for the images are available [here](https://www.kaggle.com/c/data-science-bowl-2018/discussion/54759).
+
 ## Pre-requisites:
 
 * `docker`: The [Docker](https://www.docker.com/) command-line interface. Follow the [installation instructions](https://docs.docker.com/install/) for your system.
