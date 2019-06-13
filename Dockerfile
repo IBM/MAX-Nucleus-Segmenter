@@ -1,6 +1,6 @@
 FROM codait/max-base:v1.1.1
 
-ARG model_bucket=http://max-assets.s3-api.us-geo.objectstorage.softlayer.net/max-nucleus-segmenter/v1.0
+ARG model_bucket=https://max-assets-dev.s3.us-south.cloud-object-storage.appdomain.cloud/max-nucleus-segmenter/1.0
 ARG model_file=assets.tar.gz
 
 # Add the missing packages for OpenCV
