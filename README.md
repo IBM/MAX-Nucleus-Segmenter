@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.com/IBM/MAX-Nucleus-Segmenter.svg?branch=master)](https://travis-ci.com/IBM/MAX-Nucleus-Segmenter)
 [![API demo](https://img.shields.io/website/http/max-nucleus-segmenter.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=API%20demo&down_message=down&up_message=up)](http://max-nucleus-segmenter.max.us-south.containers.appdomain.cloud/)
 
+[<img src="docs/deploy-max-to-ibm-cloud-with-kubernetes-button.png" width="400px">](http://ibm.biz/max-to-ibm-cloud-tutorial) 
+
 # IBM Developer Model Asset Exchange: Nucleus Segmenter
 
 The Nucleus Segmenter model detects nuclei in a microscopy image and specifies the pixels in the image that 
@@ -32,7 +34,7 @@ This repository was developed as part of the [IBM Developer Model Asset Exchange
 | This repository | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](LICENSE) |
 | Model Weights | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) | [LICENSE](LICENSE) |
 | Model Code (3rd party) | [MIT](https://opensource.org/licenses/MIT) | [LICENSE](https://github.com/matterport/Mask_RCNN/blob/master/LICENSE) |
-| Test assets | Various | [Asset README](assets/README.md) |
+| Test samples | Various | [Samples README](samples/README.md) |
 
 ## Training dataset
 We used image set [BBBC038v1](https://data.broadinstitute.org/bbbc/BBBC038/) from 2018 Data Science Bowl®, presented by Booz Allen Hamilton and Kaggle. The dataset is available from the Broad Bioimage Benchmark 
@@ -127,7 +129,7 @@ masks for the image from the API.
 You can also test it on the command line, for example:
 
 ```
-$ curl -F "image=@assets/example.png" -XPOST http://localhost:5000/model/predict
+$ curl -F "image=@samples/example.png" -XPOST http://localhost:5000/model/predict
 ```
 
 You should see a JSON response like that below:
