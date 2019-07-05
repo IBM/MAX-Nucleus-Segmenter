@@ -50,9 +50,9 @@ def test_predict():
     model_endpoint = 'http://localhost:5000/model/predict'
 
     # Test by the image with multiple nuclei
-    img_png = 'assets/example.png'
-    img_jpg = 'tests/example.jpg'
-    img_tiff = 'tests/example.tiff'
+    img_png = 'samples/example.png'
+    img_jpg = 'samples/example.jpg'
+    img_tiff = 'samples/example.tiff'
 
     for img_file in [img_png, img_jpg, img_tiff]:
         with open(img_file, 'rb') as file:
@@ -68,7 +68,7 @@ def test_predict():
         assert response['predictions'][0]['probability'] > 0.95
 
     # Test by the image without nuclei
-    non_nucleus_img = 'assets/non-nucleus.png'
+    non_nucleus_img = 'samples/non-nucleus.png'
     with open(non_nucleus_img, 'rb') as file:
         file_form = {'image': (non_nucleus_img, file, 'image/jpeg')}
         r = requests.post(url=model_endpoint, files=file_form)
