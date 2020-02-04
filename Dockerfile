@@ -16,7 +16,7 @@
 
 FROM codait/max-base:v1.1.3
 
-ARG model_bucket=https://max-assets-prod.s3.us-south.cloud-object-storage.appdomain.cloud/max-nucleus-segmenter/1.0.0
+ARG model_bucket=https://max.cdn.appdomain.cloud/max-nucleus-segmenter/1.0.0
 ARG model_file=assets.tar.gz
 
 # Add the missing packages for OpenCV
@@ -32,7 +32,8 @@ RUN pip install -r requirements.txt
 
 COPY . /workspace
 
-RUN md5sum -c md5sums.txt # check file integrity
+# check file integrity
+RUN sha512sum -c sha512sums.txt
 
 EXPOSE 5000
 
