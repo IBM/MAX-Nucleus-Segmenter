@@ -9,6 +9,6 @@ keras==2.1.6
 keras-applications==1.0.8
 keras-preprocessing==1.0.5
 opencv-python==4.0.0.21
-h5py==2.7.1
+h5py==2.10.0
 imgaug==0.2.6
 IPython[all]
