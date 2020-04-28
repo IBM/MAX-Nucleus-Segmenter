@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/IBM/MAX-Nucleus-Segmenter.svg?branch=master)](https://travis-ci.com/IBM/MAX-Nucleus-Segmenter)
-[![API demo](https://img.shields.io/website/http/max-nucleus-segmenter.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=API%20demo&down_message=down&up_message=up)](http://max-nucleus-segmenter.max.us-south.containers.appdomain.cloud/)
+[![API demo](https://img.shields.io/website/http/max-nucleus-segmenter.codait-prod-41208c73af8fca213512856c7a09db52-0000.us-east.containers.appdomain.cloud/swagger.json.svg?label=API%20demo&down_message=down&up_message=up)](http://max-nucleus-segmenter.codait-prod-41208c73af8fca213512856c7a09db52-0000.us-east.containers.appdomain.cloud)
 
 [<img src="docs/deploy-max-to-ibm-cloud-with-kubernetes-button.png" width="400px">](http://ibm.biz/max-to-ibm-cloud-tutorial) 
 
