@@ -121,7 +121,7 @@ def non_max_suppression(boxes, scores, threshold):
     scores: 1-D array of box scores.
     threshold: Float. IoU threshold to use for filtering.
     """
-    if boxes.shape[0] < 0:
+    if boxes.shape[0] <= 0:
         raise ValueError("boxes.shape[0] is less than 0")
     if boxes.dtype.kind != "f":
         boxes = boxes.astype(np.float32)
