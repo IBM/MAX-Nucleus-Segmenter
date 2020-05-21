@@ -121,7 +121,8 @@ def non_max_suppression(boxes, scores, threshold):
     scores: 1-D array of box scores.
     threshold: Float. IoU threshold to use for filtering.
     """
-    assert boxes.shape[0] > 0
+    if boxes.shape[0] < 0:
+        raise ValueError("boxes.shape[0] is less than 0")
     if boxes.dtype.kind != "f":
         boxes = boxes.astype(np.float32)
 
@@ -256,7 +257,8 @@ class Dataset(object):
         self.source_class_ids = {}
 
     def add_class(self, source, class_id, class_name):
-        assert "." not in source, "Source name cannot contain a dot"
+        if "." in source:
+            raise ValueError("Source name cannot contain a dot")
         # Does the class exist already?
         for info in self.class_info:
             if info['source'] == source and info["id"] == class_id:
@@ -334,7 +336,8 @@ class Dataset(object):
     def get_source_class_id(self, class_id, source):
         """Map an internal class ID to the corresponding class ID in the source dataset."""
         info = self.class_info[class_id]
-        assert info['source'] == source
+        if info['source'] != source:
+            raise AssertionError("'source' is invalid: %r" % source)
         return info['id']
 
     @property
@@ -456,7 +459,8 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     elif mode == "pad64":
         h, w = image.shape[:2]
         # Both sides must be divisible by 64
-        assert min_dim % 64 == 0, "Minimum dimension must be a multiple of 64"
+        if min_dim % 64 != 0:
+            raise ValueError("Minimum dimension must be a multiple of 64")
         # Height
         if h % 64 > 0:
             max_h = h - (h % 64) + 64
@@ -477,8 +481,8 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     elif mode == "crop":
         # Pick a random crop
         h, w = image.shape[:2]
-        y = random.randint(0, (h - min_dim))
-        x = random.randint(0, (w - min_dim))
+        y = random.randint(0, (h - min_dim))  # nosec - randint is not being used for crypto
+        x = random.randint(0, (w - min_dim))  # nosec - randint is not being used for crypto
         crop = (y, x, min_dim, min_dim)
         image = image[y:y + min_dim, x:x + min_dim]
         window = (0, 0, min_dim, min_dim)
@@ -644,7 +648,8 @@ def trim_zeros(x):
 
     x: [rows, columns].
     """
-    assert len(x.shape) == 2
+    if len(x.shape) != 2:
+        raise ValueError("len('x.shape') is not 2: %r" % len(x.shape))
     return x[~np.all(x == 0, axis=1)]
 
 
@@ -838,7 +843,7 @@ def download_trained_weights(coco_model_path, verbose=1):
     """
     if verbose > 0:
         print("Downloading pretrained model to " + coco_model_path + " ...")
-    with urllib.request.urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
+    with urllib.request.urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:  # nosec - download url
         shutil.copyfileobj(resp, out)
     if verbose > 0:
         print("... done downloading pretrained model!")
