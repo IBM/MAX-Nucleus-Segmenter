@@ -28,9 +28,9 @@ from core.mask_rcnn.mrcnn import utils
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
 if LooseVersion(tf.__version__) < LooseVersion("1.3"):
-    raise AssertionError("invalid tensorflow version: %r" % tf.__version__)
+    raise RuntimeError("invalid tensorflow version: %r" % tf.__version__)
 if LooseVersion(keras.__version__) < LooseVersion('2.0.8'):
-    raise AssertionError("invalid keras version: %r" % keras.__version__)
+    raise RuntimeError("invalid keras version: %r" % keras.__version__)
 
 
 ############################################################
@@ -1316,11 +1316,11 @@ def build_detection_targets(rpn_rois, gt_class_ids, gt_boxes, gt_masks, config):
     if rpn_rois.shape[0] <= 0:
         raise ValueError("rpn_rois.shape[0] <= 0")
     if gt_class_ids.dtype != np.int32:
-        raise ValueError("Expected int but got {}".format(gt_class_ids.dtype))
+        raise TypeError("Expected int but got {}".format(gt_class_ids.dtype))
     if gt_boxes.dtype != np.int32:
-        raise ValueError("Expected int but got {}".format(gt_boxes.dtype))
+        raise TypeError("Expected int but got {}".format(gt_boxes.dtype))
     if gt_masks.dtype != np.bool_:
-        raise ValueError("Expected bool but got {}".format(gt_masks.dtype))
+        raise TypeError("Expected bool but got {}".format(gt_masks.dtype))
 
     # It's common to add GT Boxes to ROIs but we don't do that here because
     # according to XinLei Chen's paper, it doesn't help.
