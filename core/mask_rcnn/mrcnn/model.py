@@ -1258,10 +1258,8 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         mask = det.augment_image(mask.astype(np.uint8),
                                  hooks=imgaug.HooksImages(activator=hook))
         # Verify that shapes didn't change
-        if image.shape != image_shape:
-            raise AssertionError("Augmentation shouldn't change image size")
-        if mask.shape != mask_shape:
-            raise AssertionError("Augmentation shouldn't change mask size")
+        assert image.shape == image_shape, "Augmentation shouldn't change image size"  # nosec - assert is valid
+        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"  # nosec - assert is valid
         # Change mask back to bool
         mask = mask.astype(np.bool)
 
