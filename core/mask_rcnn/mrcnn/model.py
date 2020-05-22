@@ -27,8 +27,10 @@ from core.mask_rcnn.mrcnn import utils
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
-assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
-assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
+if LooseVersion(tf.__version__) < LooseVersion("1.3"):
+    raise RuntimeError("invalid tensorflow version: %r" % tf.__version__)
+if LooseVersion(keras.__version__) < LooseVersion('2.0.8'):
+    raise RuntimeError("invalid keras version: %r" % keras.__version__)
 
 
 ############################################################
@@ -79,7 +81,8 @@ def compute_backbone_shapes(config, image_shape):
         return config.COMPUTE_BACKBONE_SHAPE(image_shape)
 
     # Currently supports ResNet only
-    assert config.BACKBONE in ["resnet50", "resnet101"]
+    if config.BACKBONE not in ["resnet50", "resnet101"]:
+        raise ValueError("invalid config.BACKBONE: %r" % config.BACKBONE)
     return np.array(
         [[int(math.ceil(image_shape[0] / stride)),
             int(math.ceil(image_shape[1] / stride))]
@@ -175,7 +178,8 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
         stage5: Boolean. If False, stage5 of the network is not created
         train_bn: Boolean. Train or freeze Batch Norm layers
     """
-    assert architecture in ["resnet50", "resnet101"]
+    if architecture not in ["resnet50", "resnet101"]:
+        raise ValueError("invalid architecture: %r" % architecture)
     # Stage 1
     x = KL.ZeroPadding2D((3, 3))(input_image)
     x = KL.Conv2D(64, (7, 7), strides=(2, 2), name='conv1', use_bias=True)(x)
@@ -1224,7 +1228,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
     # TODO: will be removed in a future update in favor of augmentation
     if augment:
         logging.warning("'augment' is deprecated. Use 'augmentation' instead.")
-        if random.randint(0, 1):
+        if random.randint(0, 1):  # nosec - randint is not being used for crypto
             image = np.fliplr(image)
             mask = np.fliplr(mask)
 
@@ -1254,8 +1258,8 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         mask = det.augment_image(mask.astype(np.uint8),
                                  hooks=imgaug.HooksImages(activator=hook))
         # Verify that shapes didn't change
-        assert image.shape == image_shape, "Augmentation shouldn't change image size"
-        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
+        assert image.shape == image_shape, "Augmentation shouldn't change image size"  # nosec - assert is valid
+        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"  # nosec - assert is valid
         # Change mask back to bool
         mask = mask.astype(np.bool)
 
@@ -1307,20 +1311,22 @@ def build_detection_targets(rpn_rois, gt_class_ids, gt_boxes, gt_masks, config):
     masks: [TRAIN_ROIS_PER_IMAGE, height, width, NUM_CLASSES). Class specific masks cropped
            to bbox boundaries and resized to neural network output size.
     """
-    assert rpn_rois.shape[0] > 0
-    assert gt_class_ids.dtype == np.int32, "Expected int but got {}".format(
-        gt_class_ids.dtype)
-    assert gt_boxes.dtype == np.int32, "Expected int but got {}".format(
-        gt_boxes.dtype)
-    assert gt_masks.dtype == np.bool_, "Expected bool but got {}".format(
-        gt_masks.dtype)
+    if rpn_rois.shape[0] <= 0:
+        raise ValueError("rpn_rois.shape[0] <= 0")
+    if gt_class_ids.dtype != np.int32:
+        raise TypeError("Expected int but got {}".format(gt_class_ids.dtype))
+    if gt_boxes.dtype != np.int32:
+        raise TypeError("Expected int but got {}".format(gt_boxes.dtype))
+    if gt_masks.dtype != np.bool_:
+        raise TypeError("Expected bool but got {}".format(gt_masks.dtype))
 
     # It's common to add GT Boxes to ROIs but we don't do that here because
     # according to XinLei Chen's paper, it doesn't help.
 
     # Trim empty padding in gt_boxes and gt_masks parts
     instance_ids = np.where(gt_class_ids > 0)[0]
-    assert instance_ids.shape[0] > 0, "Image must contain instances."
+    if instance_ids.shape[0] <= 0:
+        raise ValueError("Image must contain instances.")
     gt_class_ids = gt_class_ids[instance_ids]
     gt_boxes = gt_boxes[instance_ids]
     gt_masks = gt_masks[:, :, instance_ids]
@@ -1380,18 +1386,19 @@ def build_detection_targets(rpn_rois, gt_class_ids, gt_boxes, gt_masks, config):
         if keep.shape[0] == 0:
             # Pick bg regions with easier IoU threshold
             bg_ids = np.where(rpn_roi_iou_max < 0.5)[0]
-            assert bg_ids.shape[0] >= remaining
+            if bg_ids.shape[0] < remaining:
+                raise ValueError("remaining is greater than bg_ids.shape")
             keep_bg_ids = np.random.choice(bg_ids, remaining, replace=False)
-            assert keep_bg_ids.shape[0] == remaining
+            if keep_bg_ids.shape[0] != remaining:
+                raise ValueError("'remaining' is invalid: %r" % remaining)
             keep = np.concatenate([keep, keep_bg_ids])
         else:
             # Fill the rest with repeated bg rois.
             keep_extra_ids = np.random.choice(
                 keep_bg_ids, remaining, replace=True)
             keep = np.concatenate([keep, keep_extra_ids])
-    assert keep.shape[0] == config.TRAIN_ROIS_PER_IMAGE, \
-        "keep doesn't match ROI batch size {}, {}".format(
-            keep.shape[0], config.TRAIN_ROIS_PER_IMAGE)
+    if keep.shape[0] != config.TRAIN_ROIS_PER_IMAGE:
+        raise ValueError("keep doesn't match ROI batch size {}, {}".format(keep.shape[0], config.TRAIN_ROIS_PER_IMAGE))
 
     # Reset the gt boxes assigned to BG ROIs.
     rpn_roi_gt_boxes[keep_bg_ids, :] = 0
@@ -1417,7 +1424,8 @@ def build_detection_targets(rpn_rois, gt_class_ids, gt_boxes, gt_masks, config):
                      dtype=np.float32)
     for i in pos_ids:
         class_id = roi_gt_class_ids[i]
-        assert class_id > 0, "class id must be greater than 0"
+        if class_id <= 0:
+            raise ValueError("class id must be greater than 0")
         gt_id = roi_gt_assignment[i]
         class_mask = gt_masks[:, :, gt_id]
 
@@ -1648,7 +1656,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
     batch_size: How many images to return in each call
     detection_targets: If True, generate detection targets (class IDs, bbox
         deltas, and masks). Typically for debugging or visualizations because
-        in trainig detection targets are generated by DetectionTargetLayer.
+        in training detection targets are generated by DetectionTargetLayer.
     no_augmentation_sources: Optional. List of sources to exclude for
         augmentation. A source is string that identifies a dataset and is
         defined in the Dataset class.
@@ -1828,7 +1836,8 @@ class MaskRCNN():
         config: A Sub-class of the Config class
         model_dir: Directory to save training logs and trained weights
         """
-        assert mode in ['training', 'inference']
+        if mode not in ['training', 'inference']:
+            raise ValueError("Mode is invalid: %r" % mode)
         self.mode = mode
         self.config = config
         self.model_dir = model_dir
@@ -1841,7 +1850,8 @@ class MaskRCNN():
             mode: Either "training" or "inference". The inputs and
                 outputs of the model differ accordingly.
         """
-        assert mode in ['training', 'inference']
+        if mode not in ['training', 'inference']:
+            raise ValueError("Mode is invalid: %r" % mode)
 
         # Image size must be dividable by 2 multiple times
         h, w = config.IMAGE_SHAPE[:2]
@@ -2306,7 +2316,8 @@ class MaskRCNN():
             augmentation. A source is string that identifies a dataset and is
             defined in the Dataset class.
         """
-        assert self.mode == "training", "Create model in training mode."
+        if self.mode != "training":
+            raise AssertionError("Create model in training mode.")
 
         # Pre-defined layer regular expressions
         layer_regex = {
@@ -2489,9 +2500,10 @@ class MaskRCNN():
         scores: [N] float probability scores for the class IDs
         masks: [H, W, N] instance binary masks
         """
-        assert self.mode == "inference", "Create model in inference mode."
-        assert len(
-            images) == self.config.BATCH_SIZE, "len(images) must be equal to BATCH_SIZE"
+        if self.mode != "inference":
+            raise AssertionError("Create model in inference mode.")
+        if len(images) != self.config.BATCH_SIZE:
+            raise ValueError("len(images) must be equal to BATCH_SIZE")
 
         if verbose:
             log("Processing {} images".format(len(images)))
@@ -2505,8 +2517,9 @@ class MaskRCNN():
         # All images in a batch MUST be of the same size
         image_shape = molded_images[0].shape
         for g in molded_images[1:]:
-            assert g.shape == image_shape,\
-                "After resizing, all images must have the same size. Check IMAGE_RESIZE_MODE and image sizes."
+            if g.shape != image_shape:
+                raise ValueError("After resizing, all images must have the same size. Check IMAGE_RESIZE_MODE and image"
+                                 "sizes.")
 
         # Anchors
         anchors = self.get_anchors(image_shape)
@@ -2550,9 +2563,10 @@ class MaskRCNN():
         scores: [N] float probability scores for the class IDs
         masks: [H, W, N] instance binary masks
         """
-        assert self.mode == "inference", "Create model in inference mode."
-        assert len(molded_images) == self.config.BATCH_SIZE,\
-            "Number of images must be equal to BATCH_SIZE"
+        if self.mode != "inference":
+            raise AssertionError("Create model in inference mode.")
+        if len(molded_images) != self.config.BATCH_SIZE:
+            raise ValueError("Number of images must be equal to BATCH_SIZE")
 
         if verbose:
             log("Processing {} images".format(len(molded_images)))
@@ -2563,7 +2577,8 @@ class MaskRCNN():
         # All images in a batch MUST be of the same size
         image_shape = molded_images[0].shape
         for g in molded_images[1:]:
-            assert g.shape == image_shape, "Images must have the same size"
+            if g.shape != image_shape:
+                raise ValueError("Images must have the same size")
 
         # Anchors
         anchors = self.get_anchors(image_shape)
@@ -2683,7 +2698,8 @@ class MaskRCNN():
         # Organize desired outputs into an ordered dict
         outputs = OrderedDict(outputs)
         for o in outputs.values():
-            assert o is not None
+            if o is None:
+                raise ValueError("o is None")
 
         # Build a Keras function to run parts of the computation graph
         inputs = model.inputs

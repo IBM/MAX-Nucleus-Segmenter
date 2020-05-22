@@ -82,7 +82,7 @@ class ParallelModel(KM.Model):
                     if not isinstance(outputs, list):
                         outputs = [outputs]
                     # Save the outputs for merging back together later
-                    for l, o in enumerate(outputs):
+                    for l, o in enumerate(outputs):  # noqa - E741 ambiguous variable name
                         outputs_all[l].append(o)
 
         # Merge outputs on CPU

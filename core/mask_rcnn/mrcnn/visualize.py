@@ -104,7 +104,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     if not N:
         print("\n*** No instances to display *** \n")
     else:
-        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+        if not (boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]):
+            raise AssertionError("boxes, masks, and class_ids must have the same shape")
 
     # If no axis is passed, create one and automatically call show()
     auto_show = False
@@ -190,7 +191,8 @@ def visualize_instances(image, boxes, masks, class_ids, class_names,
     if not N:
         print("\n*** No instances to display *** \n")
     else:
-        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+        if not (boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]):
+            raise AssertionError("boxes, masks, and class_ids must have the same shape")
 
     # Generate random colors
     colors = colors or random_colors(N)
@@ -429,7 +431,8 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
     ax: (optional) Matplotlib axis to draw on.
     """
     # Number of boxes
-    assert boxes is not None or refined_boxes is not None
+    if boxes is None or refined_boxes is None:
+        raise ValueError("boxes or refined_boxes is none")
     N = boxes.shape[0] if boxes is not None else refined_boxes.shape[0]
 
     # Matplotlib Axis
@@ -534,7 +537,7 @@ def display_weight_stats(model):
     """
     layers = model.get_trainable_layers()
     table = [["WEIGHT NAME", "SHAPE", "MIN", "MAX", "STD"]]
-    for l in layers:
+    for l in layers:  # noqa (E741 ambiguous variable name)
         weight_values = l.get_weights()  # list of Numpy arrays
         weight_tensors = l.weights  # list of TF tensors
         for i, w in enumerate(weight_values):
