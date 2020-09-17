@@ -27,6 +27,6 @@ spec:
     spec:
       containers:
       - name: max-nucleus-segmenter
-        image: codait/max-nucleus-segmenter:latest
+        image: quay.io/codait/max-nucleus-segmenter:latest
         ports:
         - containerPort: 5000
