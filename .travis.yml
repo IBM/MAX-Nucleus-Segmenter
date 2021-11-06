@@ -7,7 +7,7 @@ services:
 
 install:
   - docker build -t max-nucleus-segmenter .
-  - docker run -it -d -p 5000:5000 max-nucleus-segmenter
+  - docker run -it -d -p 5050:5050 max-nucleus-segmenter
   - pip install -r requirements-test.txt
 
 before_script:
